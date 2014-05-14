@@ -1,0 +1,27 @@
+{
+  "name": "api",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "private": true,
+  "author": {
+    "name": "Jeff Dupont <jeff.dupont@phxis.net>",
+    "company": "phxis.net LLC"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "passport-local": "^1.0.0",
+    "passport": "^0.2.0",
+    "express": "^4.0.0",
+    "mongoose": "^3.8.8",
+    "morgan": "^1.0.0",
+    "express-session": "^1.0.2",
+    "cookie-parser": "^1.0.1",
+    "body-parser": "^1.0.2",
+    "jade": "^1.3.1",
+    "crypto": "0.0.3"
+  }
+}
