@@ -38,9 +38,10 @@ module.exports = function(app, config, io) {
 
   app.post("/api/users", users.createUser);
   app.put("/api/users", users.updateUser);
-  
+  app.post('/api/delempl',users.delempl); //to delete user
+  app.post('/api/delmanagerempl',users.delmanagerempl); //to delete manager user
   app.get("/api/getempl", function(req, res){
-    User.find({roles: ["employee"]}, null, {sort: {created_date: -1}}, function(err, users){
+    User.find({roles: ["employee"],$or:[{is_deleted:{$exists:false}},{is_deleted:false}]}, null, {sort: {created_date: -1}}, function(err, users){
       //console.log(users);
       if (err) {
         res.send({"message": "Something went wrong!", "err": err, "status_code": "500"});
@@ -54,7 +55,7 @@ module.exports = function(app, config, io) {
   app.post("/api/getmanagerempl", function(req, res){
     var manager_id = req.body.manager_id;
     console.log(manager_id);
-    User.find({created_by: manager_id}, null, {sort: {created_date: -1}}, function(err, users){
+    User.find({created_by: manager_id ,$or:[{is_deleted:{$exists:false}},{is_deleted:false}]}, null, {sort: {created_date: -1}}, function(err, users){
       if (err) {
         console.log(err);
         res.send({"message": "Something went wrong!", "err": err, "status_code": "500"});
@@ -150,6 +151,8 @@ module.exports = function(app, config, io) {
 
   // Create client
   app.post('/api/clients', clients.createClient);
+  app.post('/api/delclients',clients.delclients); //to delete user
+  app.post('/api/delmanagerclients',clients.delmanagerclients); //to delete manager clients
   
   // Get Manager Client List
   app.post('/api/managerclients', clients.getManagerClients);
@@ -243,8 +246,15 @@ module.exports = function(app, config, io) {
   
   //Check Logged In Employee List
   app.post('/api/checkloggedin', users.checkLoggedin);
-  
-  //For update logout status
+
+  // get shifts for employee
+  app.get('/api/getshifts', availabilities.getshifts);
+  //shifts checked by employee
+  app.post('/api/checkedshifts',availabilities.checkedshifts);
+  //for shift acknowledgement
+  app.get('/api/getshiftsacknowledgement', availabilities.getshiftsacknowledgement);
+  //to check notification
+  // app.get('/api/chknotification', availabilities.chknotification);
   app.post("/api/logout", function( req, res ) {
     
     User.findOneAndUpdate({_id: req.body.loggedid}, {logged_in:false}, function(err, response){
@@ -305,7 +315,10 @@ module.exports = function(app, config, io) {
   app.post('/api/getmemos', memos.getMemos); // RETRIEVE all memos
   app.post('/api/memos', memos.createMemo); // CREATE new memo
   app.get('/api/memos/:id', memos.getMemo); // GET memo
+  app.post('/api/delmemo',memos.delmemo); //to delete
+  app.post('/api/updmemo',memos.updmemo); //to update
   app.post('/api/markread', memos.markMemo); // MARK MEMO AS READ
+  
 
   /* API TO FILTER EMPLOYEE LIST ON DATE RANGE - viewadminemployee */
   app.post('/api/filterEmpByDate', users.filterEmpByDate);
@@ -327,6 +340,13 @@ io.on('connection', function (socket) {
         console.log("Socket Get Notifications RESPONSE Loop");
         console.log(response);
         socket.emit('notification data', response.data);
+    });
+  });
+  socket.on('get availability notification', function(data){
+    availabilities.getnotificationicon(data, function(count){
+      console.log("+=+========================+");
+      console.log(count);
+      socket.emit('notification icon data',count.data);
     });
   });
   

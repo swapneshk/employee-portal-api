@@ -325,7 +325,7 @@ var transporter = nodemailer.createTransport({
             .group({_id : "$employee_id",count: { $sum: 1 } })
             .exec(function (err, response) {
               if (err) console.log(err);
-              if (response.length) {
+              if ( response !== undefined && response.length > 0) {
                 var x = 0;
                 for (var i=0; i< response.length; i++) {
                    if(response[i].count == 7) {
@@ -360,4 +360,145 @@ var transporter = nodemailer.createTransport({
                 res.json({"message": "success", "data": response, "status_code": "200"});
             }
         }); 
+    }
+
+    //function to get shifts
+    exports.getshifts=function(req,res){
+        console.log("========");
+        // console.log(req.session.user);
+        var fields={};
+
+        fields.employee_id=req.session.user._id;
+
+        Availability.find(fields,function(err, data){
+            if(err){
+                console.log(err);
+            }
+            else{
+                console.log(data);
+                res.json({"message": "success", "data": data, "status_code": "200"});
+            
+            }
+        }).populate("manager_schedule.morning_schedule_details.event manager_schedule.late_night_schedule_details.event manager_schedule.afternoon_schedule_details.event manager_schedule.night_schedule_details.event");
+    // }).populate("event")
+    }
+
+
+    exports.checkedshifts= function(req,res){
+        Availability.findOne({_id:req.body.ID},function(err,data){
+            if(!err){
+                if(req.body.case == 'Morning'){
+                    // console.log("Val: ", data.manager_schedule.morning_schedule_details.is_approve);
+                    data.manager_schedule.morning_schedule_details.is_approve = true;
+                    // console.log("Before Data: ", data);
+                    data.save(function(err,data1){
+                        if(err)
+                            throw err;
+                        // console.log("------");
+                        // console.log("Ret Data: ", data1);
+                    });
+                    res.json({"message": "success", "status_code": "200"});
+                }
+                else if(req.body.case == 'LateNyt'){
+                    data.manager_schedule.late_night_schedule_details.is_approve=true;
+                    data.save();
+                    res.json({"message": "success", "status_code": "200"});
+                }
+                else if(req.body.case == 'Afternoon'){
+                    data.manager_schedule.afternoon_schedule_details.is_approve=true;
+                    data.save();
+                    res.json({"message": "success", "status_code": "200"});
+                }
+                else if (req.body.case == 'Night'){
+                    data.manager_schedule.night_schedule_details.is_approve=true;
+                    data.save();
+                    res.json({"message": "success", "status_code": "200"});
+                }
+            }
+            else{
+                res.json(err);
+            }
+
+        });
+    }
+
+    exports.getshiftsacknowledgement=function(req,res){
+        console.log("==========================================================================");
+        // console.log(req.session.user);
+        var fields={};
+
+        fields.modified_by=req.session.user._id;
+
+        Availability.find(fields,function(err, data){
+            if(err){
+                console.log(err);
+            }
+            else{
+                console.log(data);
+                res.json({"message": "success", "data": data, "status_code": "200"});
+            
+            }
+        })
+        .populate("manager_schedule.morning_schedule_details.event manager_schedule.late_night_schedule_details.event manager_schedule.afternoon_schedule_details.event manager_schedule.night_schedule_details.event")
+        .populate("modified_by employee_id")
+        .sort({currDate:-1});
+    }
+
+
+
+
+
+
+
+    exports.getnotificationicon =function(id,callback){
+         console.log("///////////////////////////////////////////////");
+        console.log(id);
+        var fields={};
+        setTimeout(function(){
+        fields.employee_id=id.user_id;
+        Availability.find(fields,function(err, data){
+            if(err){
+                console.log(err);
+                callback({"message": "error", "data": err, "status_code": "500"});
+            }
+            else{
+                console.log(data);
+                var count=0;
+                for(i in data)
+                {
+                    console.log('morning_schedule'+data[i].is_morning_scheduled);
+                    if(data[i].is_morning_scheduled == true){
+                        console.log("morning case");
+                        console.log(data[i].manager_schedule.morning_schedule_details.is_approve );
+                        if(data[i].manager_schedule.morning_schedule_details.is_approve == false){
+                            count = count+1;
+                        }
+                    }                   
+                    if(data[i].is_afternoon_scheduled == true){
+                        console.log("aftrnoon case");
+                        if(data[i].manager_schedule.afternoon_schedule_details.is_approve == false){
+                            console.log(data[i].manager_schedule.afternoon_schedule_details.is_approve);
+                            count = count+1;
+                        }
+                    }
+                    if(data[i].is_night_scheduled == true){
+                        console.log("nyt case");
+                        if(data[i].manager_schedule.night_schedule_details.is_approve != true){
+                            console.log(data[i].manager_schedule.night_schedule_details.is_approve);
+                            count = count+1;
+                        }
+                    }
+                    if (data[i].is_late_night_scheduled){
+                        // console.log("lnyt case");
+                        if(data[i].manager_schedule.late_night_schedule_details.is_approve != true){
+                            console.log(data[i].manager_schedule.late_night_schedule_details.is_approve);
+                            count = count+1;
+                        }
+                    }                    
+                }
+                callback({"message": "success", "data": count, "status_code": "200"});
+            }
+
+        })
+        },100);
     }

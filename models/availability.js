@@ -31,23 +31,27 @@ var availabilitySchema = mongoose.Schema({
         is_night_scheduled: Boolean,
         is_late_night_scheduled: Boolean,
         modified_date: Date,
-        modified_by: mongoose.Schema.Types.ObjectId,
+        modified_by: {type:mongoose.Schema.Types.ObjectId,ref:'User'},
         manager_schedule: {
            modified_date: Date,
            modified_by: mongoose.Schema.Types.ObjectId,
            morning_schedule_details:{
+                is_approve: {type:Boolean,default:false},
                 is_morning_scheduled: Boolean,
                 event: {type: mongoose.Schema.Types.ObjectId, ref: 'Event'}
                 },
            afternoon_schedule_details:{
+                is_approve: {type:Boolean,default:false},
                 is_afternoon_scheduled: Boolean,
                 event: {type: mongoose.Schema.Types.ObjectId, ref: 'Event'}
                 },
            night_schedule_details:{
+                is_approve: {type:Boolean,default:false},
                 is_night_scheduled: Boolean,
                 event: {type: mongoose.Schema.Types.ObjectId, ref: 'Event'}
                 },
            late_night_schedule_details:{
+                is_approve: {type:Boolean,default:false},
                 is_late_night_scheduled: Boolean,
                 event: {type: mongoose.Schema.Types.ObjectId, ref: 'Event'}
                 }

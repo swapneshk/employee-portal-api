@@ -7,6 +7,7 @@ var memoSchema = mongoose.Schema({
         creator_name: String,
         created_by: mongoose.Schema.Types.ObjectId,
         created_date: Date,
+        mins:Number,
         sent_to: [{user_id: mongoose.Schema.Types.ObjectId, mark_read: {type: Boolean, default: false}, read_date: Date}],
         admin_checked: { type: Boolean, default: false }
 });

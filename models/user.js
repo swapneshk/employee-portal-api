@@ -24,6 +24,10 @@ var userSchema = mongoose.Schema({
     require: "{PATH} is required"
   },
   roles: [String],
+  employeeid: {
+    type: String,
+    require: "{PATH} is required"
+  }
   address: {
     line1: String,
     line2: String,
@@ -34,6 +38,9 @@ var userSchema = mongoose.Schema({
   active: {
     type: Boolean,
     default: false
+  },
+  is_deleted: {
+    type: Boolean,default: false
   },
   phone: String,
   password_change: {

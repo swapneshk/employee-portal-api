@@ -26,6 +26,8 @@ var eventSchema = mongoose.Schema({
     start_date: Date,
     end_date: Date,
     is_active: Boolean,
+    
+    
     event_data: {
         created_at: Date,
         updated_at: Date,

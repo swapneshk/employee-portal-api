@@ -35,6 +35,9 @@ var clientSchema = mongoose.Schema({
   is_active: {
     type: Boolean
   },
+  is_deleted:{
+    type: Boolean,default:false
+  },
   created_by: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'

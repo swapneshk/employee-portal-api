@@ -259,3 +259,32 @@ exports.checkLoggedin = function(req,res){
             }
         }); 
 }
+//delete User
+exports.delempl=function(req,res){
+      console.log("---delete empl---");
+      console.log(req.body.empid);
+      var empId = req.body.empid;
+      User.update({_id:empId},{$set:{is_deleted:true}},{},function(err,response){
+        if(err){
+              res.json({"message": "error", "data": err, "status_code": "500"});
+              }
+        else{
+              res.json({"message": "success", "data": response, "status_code": "200"});
+            }
+      });
+    }
+
+//delete manageremp
+exports.delmanagerempl=function(req,res){
+      console.log("---delete empl---");
+      console.log(req.body.empid);
+      var empId = req.body.empid;
+      User.update({_id:empId},{$set:{is_deleted:true}},{},function(err,response){
+        if(err){
+              res.json({"message": "error", "data": err, "status_code": "500"});
+              }
+        else{
+              res.json({"message": "success", "data": response, "status_code": "200"});
+            }
+      });
+    }

@@ -23,7 +23,7 @@ var Client = require("mongoose").model("Client");
     var userID = req.body.manager_id;    
     console.log(req.body);
     if (userID) {      
-      Client.find({created_by: userID}, null, {sort: {created_date: -1}}, function(err, clients) {
+      Client.find({created_by: userID ,$or:[{is_deleted:{$exists:false}},{is_deleted:false}]}, null, {sort: {created_date: -1}}, function(err, clients) {
         console.log(clients);
         res.send({"status_code": "200", "data": clients});
       });
@@ -32,9 +32,9 @@ var Client = require("mongoose").model("Client");
   
   // Fetch ALL Clients For An _id[Admin]
   exports.getAllClients = function( req, res ) {
-    console.log("--FIND ADMIN CLIENTS--");   
+    console.log("--FIND ADMIN CLIENTS---");   
     
-    Client.find({}, null, {sort: {created_date: -1}}, function(err, clients){
+    Client.find({$or:[{is_deleted:{$exists:false}},{is_deleted:false}]}, null, {sort: {created_date: -1}}, function(err, clients){
       console.log(clients);
       res.send({"status_code": "200", "data": clients});
     });
@@ -96,6 +96,37 @@ var Client = require("mongoose").model("Client");
       });
     }
   };
+
+  exports.delclients=function(req,res){
+      console.log("---delete clients---");
+      console.log(req.body.clientid);
+      var clientid = req.body.clientid;
+      Client.update({_id:clientid},{$set:{is_deleted:true}},{},function(err,response){
+        if(err){
+              res.json({"message": "error", "data": err, "status_code": "500"});
+              }
+        else{
+              res.json({"message": "success", "data": response, "status_code": "200"});
+            }
+      });
+
+}
+
+// delmanagerclients
+exports.delmanagerclients=function(req,res){
+  console.log("---delete clients---");
+      console.log(req.body.clientid);
+      var clientid = req.body.clientid;
+      Client.update({_id:clientid},{$set:{is_deleted:true}},{},function(err,response){
+        if(err){
+              res.json({"message": "error", "data": err, "status_code": "500"});
+              }
+        else{
+              res.json({"message": "success", "data": response, "status_code": "200"});
+            }
+      });
+
+}
 
   // Remove Client By An _id - COMMENTED FOR THE TIME BEING by @Swapnesh on @05-08-2014
   /*
